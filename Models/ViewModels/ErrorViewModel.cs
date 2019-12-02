@@ -1,6 +1,6 @@
 using System;
 
-namespace testSalesMVC.Models {
+namespace testSalesMVC.Models.ViewModels {
     public class ErrorViewModel {
         public string RequestId { get; set; }
 

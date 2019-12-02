@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using testSalesMVC.Models;
+using testSalesMVC.Models.ViewModels;
 
 namespace testSalesMVC.Controllers {
     public class HomeController : Controller {
@@ -20,6 +20,7 @@ namespace testSalesMVC.Controllers {
         }
 
         public IActionResult Privacy() {
+            ViewData["email"] = "email@company.com";
             return View();
         }
 
