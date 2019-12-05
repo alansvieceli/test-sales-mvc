@@ -23,8 +23,9 @@ namespace testSalesMVC {
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllersWithViews();
 
-    services.AddDbContext<testSalesMVCContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("testSalesMVCContext")));
+            services.AddDbContext<testSalesMVCContext>(options =>
+                    options.UseMySql(Configuration.GetConnectionString("testSalesMVCContext"), builder => 
+                            builder.MigrationsAssembly("testSalesMVC")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
