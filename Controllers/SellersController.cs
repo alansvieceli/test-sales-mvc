@@ -6,45 +6,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
+using testSalesMVC.Services;
 
-namespace testSalesMVC.Controllers
-{
-    public class SellersController : Controller
-    {
-        private readonly testSalesMVCContext _context;
+namespace testSalesMVC.Controllers {
+    public class SellersController : Controller {
+        private readonly SellerService _sellerService;
 
-        public SellersController(testSalesMVCContext context)
-        {
-            _context = context;
+        public SellersController(SellerService sellerService) {
+            _sellerService = sellerService;
         }
 
         // GET: Sellers
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Seller.ToListAsync());
+        public IActionResult Index() {
+            return View( _sellerService.FindAll());
         }
 
         // GET: Sellers/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        public IActionResult Details(int id) {
 
-            var seller = await _context.Seller
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (seller == null)
-            {
+            var seller =  _sellerService.FindById(id);
+
+            if (seller == null) {
                 return NotFound();
             }
 
             return View(seller);
+
         }
 
         // GET: Sellers/Create
-        public IActionResult Create()
-        {
+        public IActionResult Create() {
             return View();
         }
 
@@ -53,31 +44,27 @@ namespace testSalesMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(seller);
-                await _context.SaveChangesAsync();
+        public IActionResult Create([Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller) {
+
+            if (ModelState.IsValid) {
+                _sellerService.Add(seller);
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);
+
         }
 
         // GET: Sellers/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
+        public IActionResult Edit(int id) {
+
+            var seller =  _sellerService.FindById(id);
+
+            if (seller == null) {
                 return NotFound();
             }
 
-            var seller = await _context.Seller.FindAsync(id);
-            if (seller == null)
-            {
-                return NotFound();
-            }
             return View(seller);
+
         }
 
         // POST: Sellers/Edit/5
@@ -85,48 +72,30 @@ namespace testSalesMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller)
-        {
-            if (id != seller.Id)
-            {
+        public IActionResult Edit(int id, [Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller) {
+
+            if (id != seller.Id) {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(seller);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SellerExists(seller.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                var sellerRet = _sellerService.Edit(seller);
+                if (sellerRet == null) {
+                    return NotFound();
                 }
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);
+
         }
 
         // GET: Sellers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        public IActionResult Delete(int? id) {
 
-            var seller = await _context.Seller
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (seller == null)
-            {
+            var seller = _sellerService.FindById(id);
+
+            if (seller == null) {
                 return NotFound();
             }
 
@@ -136,17 +105,10 @@ namespace testSalesMVC.Controllers
         // POST: Sellers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var seller = await _context.Seller.FindAsync(id);
-            _context.Seller.Remove(seller);
-            await _context.SaveChangesAsync();
+        public IActionResult DeleteConfirmed(int? id) {
+            _sellerService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SellerExists(int id)
-        {
-            return _context.Seller.Any(e => e.Id == id);
-        }
     }
 }

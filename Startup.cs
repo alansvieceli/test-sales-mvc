@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
 using testSalesMVC.Data;
+using testSalesMVC.Services;
 
 namespace testSalesMVC {
     public class Startup {
@@ -28,7 +29,9 @@ namespace testSalesMVC {
                     options.UseMySql(Configuration.GetConnectionString("testSalesMVCContext"), builder => 
                             builder.MigrationsAssembly("testSalesMVC")));
 
-            services.AddScoped<SeedingService>(); //registra o nosso serviço na injeção de dependencia da aplicação
+            //registra o nossos serviço na injeção de dependencia da aplicação
+            services.AddScoped<SeedingService>();
+            services.AddScoped<SellerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
