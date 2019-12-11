@@ -25,9 +25,9 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers/Details/5
-        public IActionResult Details(int id) {
+        public IActionResult Details(int? id) {
 
-            var seller =  _sellerService.FindById(id);
+            var seller =  _sellerService.FindById(id.Value);
 
             if (seller == null) {
                 return NotFound();

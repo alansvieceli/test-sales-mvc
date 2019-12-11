@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using testSalesMVC.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace testSalesMVC.Services {
     
@@ -20,7 +21,7 @@ namespace testSalesMVC.Services {
         }
 
         public Seller FindById(int? id) {
-            return (id == null) ? null : _context.Seller.FirstOrDefault(m => m.Id == id);
+            return (id == null) ? null : _context.Seller.Include(s => s.Department).FirstOrDefault(m => m.Id == id);
         }
 
         public void Insert(Seller seller) {
