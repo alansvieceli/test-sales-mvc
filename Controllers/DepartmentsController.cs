@@ -50,7 +50,7 @@ namespace testSalesMVC.Controllers
         public IActionResult Create([Bind("Id,Name")] Department department)
         {
             if (ModelState.IsValid) {
-                _departmentService.Add(department);
+                _departmentService.Insert(department);
                 return RedirectToAction(nameof(Index));
             }
             return View(department);
@@ -80,7 +80,7 @@ namespace testSalesMVC.Controllers
             }
 
             if (ModelState.IsValid) {
-                var departmentRet = _departmentService.Edit(department);
+                var departmentRet = _departmentService.Update(department);
                 if (departmentRet == null) {
                     return NotFound();
                 }

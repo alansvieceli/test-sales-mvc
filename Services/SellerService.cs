@@ -23,7 +23,7 @@ namespace testSalesMVC.Services {
             return (id == null) ? null : _context.Seller.FirstOrDefault(m => m.Id == id);
         }
 
-        public void Add(Seller seller) {
+        public void Insert(Seller seller) {
             _context.Add(seller);
             _context.SaveChanges();
         }
@@ -34,7 +34,7 @@ namespace testSalesMVC.Services {
             _context.SaveChanges();
         }
 
-        public Seller Edit(Seller seller) {
+        public Seller Update(Seller seller) {
             try {
                 _context.Update(seller);
                 _context.SaveChanges();

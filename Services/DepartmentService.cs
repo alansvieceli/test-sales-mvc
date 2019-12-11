@@ -23,7 +23,7 @@ namespace testSalesMVC.Services {
             return (id == null) ? null : _context.Department.FirstOrDefault(m => m.Id == id);
         }
 
-        public void Add(Department department) {
+        public void Insert(Department department) {
             _context.Add(department);
             _context.SaveChanges();
         }
@@ -34,7 +34,7 @@ namespace testSalesMVC.Services {
             _context.SaveChanges();
         }
 
-        public Department Edit(Department department) {
+        public Department Update(Department department) {
             try {
                 _context.Update(department);
                 _context.SaveChanges();

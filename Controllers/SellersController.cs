@@ -6,14 +6,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
+using testSalesMVC.Models.ViewModels;
 using testSalesMVC.Services;
 
 namespace testSalesMVC.Controllers {
     public class SellersController : Controller {
         private readonly SellerService _sellerService;
+        private readonly DepartmentService _departmentService;
 
-        public SellersController(SellerService sellerService) {
+        public SellersController(SellerService sellerService, DepartmentService departmentService) {
             _sellerService = sellerService;
+            _departmentService = departmentService;
         }
 
         // GET: Sellers
@@ -36,7 +39,9 @@ namespace testSalesMVC.Controllers {
 
         // GET: Sellers/Create
         public IActionResult Create() {
-            return View();
+            var departments = _departmentService.FindAll();
+            var viewModel = new SellerFormViewModel { Departments = departments };
+            return View(viewModel);
         }
 
         // POST: Sellers/Create
@@ -44,10 +49,10 @@ namespace testSalesMVC.Controllers {
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller) {
+        public IActionResult Create(Seller seller) {
 
             if (ModelState.IsValid) {
-                _sellerService.Add(seller);
+                _sellerService.Insert(seller);
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);
@@ -80,7 +85,7 @@ namespace testSalesMVC.Controllers {
 
             if (ModelState.IsValid)
             {
-                var sellerRet = _sellerService.Edit(seller);
+                var sellerRet = _sellerService.Update(seller);
                 if (sellerRet == null) {
                     return NotFound();
                 }
