@@ -98,7 +98,7 @@ namespace testSalesMVC.Controllers {
         // GET: Sellers/Delete/5
         public IActionResult Delete(int? id) {
 
-            var seller = _sellerService.FindById(id);
+            var seller = _sellerService.FindById(id.Value);
 
             if (seller == null) {
                 return NotFound();
@@ -111,7 +111,7 @@ namespace testSalesMVC.Controllers {
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int? id) {
-            _sellerService.Delete(id);
+            _sellerService.Delete(id.Value);
             return RedirectToAction(nameof(Index));
         }
 
