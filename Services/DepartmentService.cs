@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using testSalesMVC.Models;
+using testSalesMVC.Services.Exceptions;
 
 namespace testSalesMVC.Services {
 
@@ -34,23 +35,19 @@ namespace testSalesMVC.Services {
             _context.SaveChanges();
         }
 
-        public Department Update(Department department) {
+        public void Update(Department department) {
+            if (!_context.Department.Any(s => s.Id == department.Id)) {
+                throw new NotFoundException("Id not found");
+            }
+
             try {
                 _context.Update(department);
                 _context.SaveChanges();
-                return department;
-            }
-            catch (DbUpdateConcurrencyException) {
-                if (!Exists(department.Id)) {
-                    return null;
-                } else {
-                    throw;
-                }
-            }
-        }
 
-        private bool Exists(int id) {
-            return _context.Department.Any(e => e.Id == id);
+            }
+            catch (DbUpdateConcurrencyException e) {
+                throw new DbConcurrencyException(e.Message);
+            }
         }
     }
 

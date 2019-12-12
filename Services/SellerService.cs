@@ -5,9 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using testSalesMVC.Models;
 using Microsoft.EntityFrameworkCore;
+using testSalesMVC.Services.Exceptions;
 
 namespace testSalesMVC.Services {
-    
+
     public class SellerService {
 
         private readonly testSalesMVCContext _context;
@@ -35,23 +36,21 @@ namespace testSalesMVC.Services {
             _context.SaveChanges();
         }
 
-        public Seller Update(Seller seller) {
+        public void Update(Seller seller) {
+
+            if (!_context.Seller.Any(s => s.Id == seller.Id)) {
+                throw new NotFoundException("Id not found");
+            }
+
             try {
                 _context.Update(seller);
                 _context.SaveChanges();
-                return seller;
-            }
-            catch (DbUpdateConcurrencyException) {
-                if (!Exists(seller.Id)) {
-                    return null;
-                } else {
-                    throw;
-                }
-            }
-        }
 
-        private bool Exists(int id) {
-            return _context.Seller.Any(e => e.Id == id);
+            }
+            catch (DbUpdateConcurrencyException e) {
+                throw new DbConcurrencyException(e.Message);
+            }
+
         }
     }
 

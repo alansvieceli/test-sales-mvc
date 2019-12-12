@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
 using testSalesMVC.Services;
+using testSalesMVC.Services.Exceptions;
 
 namespace testSalesMVC.Controllers
 {
@@ -73,20 +74,25 @@ namespace testSalesMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,Name")] Department department)
+        public IActionResult Edit(int? id, Department department)
         {
             if (id != department.Id) {
-                return NotFound();
+                return BadRequest();
             }
 
             if (ModelState.IsValid) {
-                var departmentRet = _departmentService.Update(department);
-                if (departmentRet == null) {
+                try {
+                    _departmentService.Update(department);                    
+                }
+                catch (NotFoundException e) {
                     return NotFound();
                 }
-                return RedirectToAction(nameof(Index));
+                catch (DbConcurrencyException e) {
+                    return BadRequest();
+                }
             }
-            return View(department);
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Departments/Delete/5

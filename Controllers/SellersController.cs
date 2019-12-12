@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
 using testSalesMVC.Models.ViewModels;
 using testSalesMVC.Services;
+using testSalesMVC.Services.Exceptions;
 
 namespace testSalesMVC.Controllers {
     public class SellersController : Controller {
@@ -60,15 +61,17 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers/Edit/5
-        public IActionResult Edit(int id) {
+        public IActionResult Edit(int? id) {
 
-            var seller =  _sellerService.FindById(id);
+            var seller =  _sellerService.FindById(id.Value);
 
             if (seller == null) {
                 return NotFound();
             }
 
-            return View(seller);
+            List<Department> departments = _departmentService.FindAll();
+            var viewModel = new SellerFormViewModel { Seller = seller,  Departments = departments };
+            return View(viewModel);
 
         }
 
@@ -77,21 +80,26 @@ namespace testSalesMVC.Controllers {
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Id,Name,Email,BirthDate,baseSalary")] Seller seller) {
+        public IActionResult Edit(int? id, Seller seller) {
 
             if (id != seller.Id) {
-                return NotFound();
+                return BadRequest();
             }
 
             if (ModelState.IsValid)
             {
-                var sellerRet = _sellerService.Update(seller);
-                if (sellerRet == null) {
+                try {
+                    _sellerService.Update(seller);
+                }
+                catch(NotFoundException e) {
                     return NotFound();
                 }
-                return RedirectToAction(nameof(Index));
+                catch(DbConcurrencyException e) {
+                    return BadRequest();
+                }
             }
-            return View(seller);
+
+            return RedirectToAction(nameof(Index));
 
         }
 
