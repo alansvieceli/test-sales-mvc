@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +30,8 @@ namespace testSalesMVC.Controllers {
         public IActionResult Details(int? id) {
 
             var seller =  _sellerService.FindById(id.Value);
-
             if (seller == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(seller);
@@ -64,9 +64,8 @@ namespace testSalesMVC.Controllers {
         public IActionResult Edit(int? id) {
 
             var seller =  _sellerService.FindById(id.Value);
-
             if (seller == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new {  message = "Id not found"});
             }
 
             List<Department> departments = _departmentService.FindAll();
@@ -83,7 +82,7 @@ namespace testSalesMVC.Controllers {
         public IActionResult Edit(int? id, Seller seller) {
 
             if (id != seller.Id) {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
 
             if (ModelState.IsValid)
@@ -91,11 +90,8 @@ namespace testSalesMVC.Controllers {
                 try {
                     _sellerService.Update(seller);
                 }
-                catch(NotFoundException e) {
-                    return NotFound();
-                }
-                catch(DbConcurrencyException e) {
-                    return BadRequest();
+                catch(ApplicationException e) {
+                    return RedirectToAction(nameof(Error), new { message = e.Message });
                 }
             }
 
@@ -107,9 +103,8 @@ namespace testSalesMVC.Controllers {
         public IActionResult Delete(int? id) {
 
             var seller = _sellerService.FindById(id.Value);
-
             if (seller == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(seller);
@@ -121,6 +116,15 @@ namespace testSalesMVC.Controllers {
         public IActionResult DeleteConfirmed(int? id) {
             _sellerService.Delete(id.Value);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Error(string message) {
+            var viewModel = new ErrorViewModel {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(viewModel);
         }
 
     }

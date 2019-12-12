@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using testSalesMVC.Models;
+using testSalesMVC.Models.ViewModels;
 using testSalesMVC.Services;
 using testSalesMVC.Services.Exceptions;
 
@@ -29,9 +31,8 @@ namespace testSalesMVC.Controllers
         public IActionResult Details(int id) {
 
             var department = _departmentService.FindById(id);
-
             if (department == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(department);
@@ -61,9 +62,8 @@ namespace testSalesMVC.Controllers
         public IActionResult Edit(int? id)
         {
             var department = _departmentService.FindById(id);
-
             if (department == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(department);
@@ -77,18 +77,15 @@ namespace testSalesMVC.Controllers
         public IActionResult Edit(int? id, Department department)
         {
             if (id != department.Id) {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
             }
 
             if (ModelState.IsValid) {
                 try {
                     _departmentService.Update(department);                    
                 }
-                catch (NotFoundException e) {
-                    return NotFound();
-                }
-                catch (DbConcurrencyException e) {
-                    return BadRequest();
+                catch (ApplicationException e) {
+                    return RedirectToAction(nameof(Error), new { message = e.Message });
                 }
             }
 
@@ -99,9 +96,8 @@ namespace testSalesMVC.Controllers
         public IActionResult Delete(int? id)
         {
             var department = _departmentService.FindById(id);
-
             if (department == null) {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
 
             return View(department);
@@ -114,6 +110,15 @@ namespace testSalesMVC.Controllers
         {
             _departmentService.Delete(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Error(string message) {
+            var viewModel = new ErrorViewModel {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(viewModel);
         }
     }
 }
