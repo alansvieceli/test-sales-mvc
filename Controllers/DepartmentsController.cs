@@ -108,8 +108,13 @@ namespace testSalesMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _departmentService.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            try { 
+                await _departmentService.DeleteAsync(id);
+                return RedirectToAction(nameof(Index));
+            } 
+            catch(IntegrityException e) {
+                return RedirectToAction(nameof(Error), new { message = e.Message });
+            }
         }
 
         public IActionResult Error(string message) {

@@ -31,8 +31,14 @@ namespace testSalesMVC.Services {
 
         public async Task DeleteAsync(int? id) {
             var department = await _context.Department.FindAsync(id);
-            _context.Department.Remove(department);
-            await _context.SaveChangesAsync();
+
+            try {
+                _context.Department.Remove(department);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e) {
+                throw new IntegrityException(e.Message);
+            }
         }
 
         public async Task UpdateAsync(Department department) {
