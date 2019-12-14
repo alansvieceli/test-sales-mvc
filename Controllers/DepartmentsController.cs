@@ -23,14 +23,14 @@ namespace testSalesMVC.Controllers
         }
 
         // GET: Departments
-        public IActionResult Index() {
-            return View(_departmentService.FindAll());
+        public async Task<IActionResult> Index() {
+            return View(await _departmentService.FindAllAsync());
         }
 
         // GET: Departments/Details/5
-        public IActionResult Details(int id) {
+        public async Task<IActionResult> Details(int id) {
 
-            var department = _departmentService.FindById(id);
+            var department = await _departmentService.FindByIdAsync(id);
             if (department == null) {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
@@ -49,19 +49,19 @@ namespace testSalesMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,Name")] Department department)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Department department)
         {
             if (ModelState.IsValid) {
-                _departmentService.Insert(department);
+                await _departmentService.InsertAsync(department);
                 return RedirectToAction(nameof(Index));
             }
             return View(department);
         }
 
         // GET: Departments/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            var department = _departmentService.FindById(id);
+            var department = await _departmentService.FindByIdAsync(id);
             if (department == null) {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
@@ -74,7 +74,7 @@ namespace testSalesMVC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int? id, Department department)
+        public async Task<IActionResult> Edit(int? id, Department department)
         {
             if (id != department.Id) {
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
@@ -82,7 +82,7 @@ namespace testSalesMVC.Controllers
 
             if (ModelState.IsValid) {
                 try {
-                    _departmentService.Update(department);                    
+                    await _departmentService.UpdateAsync(department);                    
                 }
                 catch (ApplicationException e) {
                     return RedirectToAction(nameof(Error), new { message = e.Message });
@@ -93,9 +93,9 @@ namespace testSalesMVC.Controllers
         }
 
         // GET: Departments/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            var department = _departmentService.FindById(id);
+            var department = await _departmentService.FindByIdAsync(id);
             if (department == null) {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
@@ -106,9 +106,9 @@ namespace testSalesMVC.Controllers
         // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            _departmentService.Delete(id);
+            await _departmentService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

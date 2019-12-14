@@ -16,33 +16,35 @@ namespace testSalesMVC.Services {
             _context = context;
         }
 
-        public List<Department> FindAll() {
-            return _context.Department.OrderBy(x => x.Name).ToList();
+        public async Task<List<Department>> FindAllAsync() {
+            return await _context.Department.OrderBy(x => x.Name).ToListAsync();
         }
 
-        public Department FindById(int? id) {
-            return (id == null) ? null : _context.Department.FirstOrDefault(m => m.Id == id);
+        public async Task<Department> FindByIdAsync(int? id) {
+            return (id == null) ? null : await _context.Department.FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public void Insert(Department department) {
+        public async Task InsertAsync(Department department) {
             _context.Add(department);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int? id) {
-            var department = _context.Department.Find(id);
+        public async Task DeleteAsync(int? id) {
+            var department = await _context.Department.FindAsync(id);
             _context.Department.Remove(department);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Department department) {
-            if (!_context.Department.Any(s => s.Id == department.Id)) {
+        public async Task UpdateAsync(Department department) {
+
+            var hasAny = await _context.Department.AnyAsync(s => s.Id == department.Id);
+            if (!hasAny) {
                 throw new NotFoundException("Id not found");
             }
 
             try {
                 _context.Update(department);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
             }
             catch (DbUpdateConcurrencyException e) {

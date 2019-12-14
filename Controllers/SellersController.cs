@@ -22,14 +22,14 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers
-        public IActionResult Index() {
-            return View( _sellerService.FindAll());
+        public async Task<IActionResult> Index() {
+            return View( await _sellerService.FindAllAsync());
         }
 
         // GET: Sellers/Details/5
-        public IActionResult Details(int? id) {
+        public async Task<IActionResult> Details(int? id) {
 
-            var seller =  _sellerService.FindById(id.Value);
+            var seller =  await _sellerService.FindByIdAsync(id.Value);
             if (seller == null) {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
@@ -39,8 +39,8 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers/Create
-        public IActionResult Create() {
-            var departments = _departmentService.FindAll();
+        public async Task<IActionResult> Create() {
+            var departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Departments = departments };
             return View(viewModel);
         }
@@ -50,10 +50,10 @@ namespace testSalesMVC.Controllers {
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Seller seller) {
+        public async Task<IActionResult> Create(Seller seller) {
 
             if (ModelState.IsValid) {
-                _sellerService.Insert(seller);
+                await _sellerService.InsertAsync(seller);
                 return RedirectToAction(nameof(Index));
             }
             return View(seller);
@@ -61,14 +61,14 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers/Edit/5
-        public IActionResult Edit(int? id) {
+        public async Task<IActionResult> Edit(int? id) {
 
-            var seller =  _sellerService.FindById(id.Value);
+            var seller =  await _sellerService.FindByIdAsync(id.Value);
             if (seller == null) {
                 return RedirectToAction(nameof(Error), new {  message = "Id not found"});
             }
 
-            List<Department> departments = _departmentService.FindAll();
+            List<Department> departments = await _departmentService.FindAllAsync();
             var viewModel = new SellerFormViewModel { Seller = seller,  Departments = departments };
             return View(viewModel);
 
@@ -79,7 +79,7 @@ namespace testSalesMVC.Controllers {
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int? id, Seller seller) {
+        public async Task<IActionResult> Edit(int? id, Seller seller) {
 
             if (id != seller.Id) {
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
@@ -88,7 +88,7 @@ namespace testSalesMVC.Controllers {
             if (ModelState.IsValid)
             {
                 try {
-                    _sellerService.Update(seller);
+                    await _sellerService.UpdateAsync(seller);
                 }
                 catch(ApplicationException e) {
                     return RedirectToAction(nameof(Error), new { message = e.Message });
@@ -100,9 +100,9 @@ namespace testSalesMVC.Controllers {
         }
 
         // GET: Sellers/Delete/5
-        public IActionResult Delete(int? id) {
+        public async Task<IActionResult> Delete(int? id) {
 
-            var seller = _sellerService.FindById(id.Value);
+            var seller = await _sellerService.FindByIdAsync(id.Value);
             if (seller == null) {
                 return RedirectToAction(nameof(Error), new { message = "Id not found" });
             }
@@ -113,8 +113,8 @@ namespace testSalesMVC.Controllers {
         // POST: Sellers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int? id) {
-            _sellerService.Delete(id.Value);
+        public async Task<IActionResult> DeleteConfirmed(int? id) {
+            await _sellerService.DeleteAsync(id.Value);
             return RedirectToAction(nameof(Index));
         }
 
